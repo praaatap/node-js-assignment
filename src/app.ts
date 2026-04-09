@@ -16,9 +16,53 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
 
-// Serve OpenAPI documentation
+// Serve OpenAPI documentation - custom HTML with CDN for Vercel compatibility
 const openApiSpec = YAML.load(path.join(__dirname, "../openapi.yaml"));
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
+const openApiJson = JSON.stringify(openApiSpec);
+
+app.get("/docs", (_req, res) => {
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School API Docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css">
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = () => {
+      SwaggerUIBundle({
+        spec: ${openApiJson},
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout"
+      });
+    };
+  </script>
+</body>
+</html>
+  `);
+});
+
+
+app.get('/' , (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Welcome to the School API Built by Pratap Singh https://github.com/praaatap"
+  });
+});
 
 app.get("/health", (_req, res) => {
   res.status(200).json({
