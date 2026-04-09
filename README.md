@@ -2,7 +2,47 @@
 
 This project implements two APIs for school management using Node.js, Express, TypeScript, and MySQL.
 
-## Folder Structure
+## 🔗 Live API
+
+**Base URL:** https://node-js-assignment-pearl.vercel.app
+
+- **Health Check:** https://node-js-assignment-pearl.vercel.app/health
+- **API Docs:** https://node-js-assignment-pearl.vercel.app/docs
+
+## 📮 Postman Collection
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://node-js-assignment-pearl.vercel.app/docs)
+
+Import the collection from: `postman/School-Management-APIs.postman_collection.json`
+
+**Setup in Postman:**
+1. Import the collection file
+2. Go to **Collection Variables**
+3. Set `baseUrl` = `https://node-js-assignment-pearl.vercel.app`
+
+### Available Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/` | Welcome message |
+| `GET` | `/health` | Health check |
+| `GET` | `/docs` | Swagger API documentation |
+| `POST` | `/addSchool` | Add a new school |
+| `GET` | `/listSchools` | List schools sorted by distance |
+
+### Quick cURL Examples
+
+```bash
+# Add a school
+curl -X POST https://node-js-assignment-pearl.vercel.app/addSchool \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Green Valley School","address":"12 Park Street, Bangalore","latitude":12.9716,"longitude":77.5946}'
+
+# List schools near a location
+curl "https://node-js-assignment-pearl.vercel.app/listSchools?latitude=12.9716&longitude=77.5946"
+```
+
+## 📋 Folder Structure
 
 ```text
 src/
