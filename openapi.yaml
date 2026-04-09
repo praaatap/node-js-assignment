@@ -1,0 +1,189 @@
+openapi: 3.0.3
+info:
+  title: School Management API
+  description: API for managing schools with location-based queries
+  version: 1.0.0
+  contact:
+    name: API Support
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the server
+      tags:
+        - System
+      responses:
+        '200':
+          description: Server is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Server is healthy
+  /addSchool:
+    post:
+      summary: Add a new school
+      description: Creates a new school record with location information
+      tags:
+        - Schools
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - address
+                - latitude
+                - longitude
+              properties:
+                name:
+                  type: string
+                  example: Lincoln High School
+                  description: Name of the school
+                address:
+                  type: string
+                  example: 123 Main St, Springfield, IL
+                  description: Full address of the school
+                latitude:
+                  type: number
+                  format: float
+                  example: 40.7128
+                  description: Latitude coordinate
+                longitude:
+                  type: number
+                  format: float
+                  example: -74.006
+                  description: Longitude coordinate
+      responses:
+        '201':
+          description: School added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: School added successfully
+                  data:
+                    $ref: '#/components/schemas/School'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /listSchools:
+    get:
+      summary: List schools sorted by distance
+      description: Returns all schools sorted by distance from provided coordinates
+      tags:
+        - Schools
+      parameters:
+        - name: latitude
+          in: query
+          required: true
+          description: User's latitude coordinate
+          schema:
+            type: number
+            format: float
+            example: 40.7128
+        - name: longitude
+          in: query
+          required: true
+          description: User's longitude coordinate
+          schema:
+            type: number
+            format: float
+            example: -74.006
+      responses:
+        '200':
+          description: List of schools sorted by distance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SchoolWithDistance'
+        '400':
+          description: Missing or invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    School:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Lincoln High School
+        address:
+          type: string
+          example: 123 Main St, Springfield, IL
+        latitude:
+          type: number
+          format: float
+          example: 40.7128
+        longitude:
+          type: number
+          format: float
+          example: -74.006
+    SchoolWithDistance:
+      allOf:
+        - $ref: '#/components/schemas/School'
+        - type: object
+          properties:
+            distanceKm:
+              type: number
+              format: float
+              example: 2.5
+              description: Distance from provided coordinates in kilometers
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Error message
+        error:
+          type: string
+          example: Detailed error information
